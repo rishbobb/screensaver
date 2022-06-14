@@ -4,6 +4,7 @@
 )]
 
 use std::process::Command;
+use std::path::Path;
 
 fn main() {
   tauri::Builder::default()
@@ -14,7 +15,17 @@ fn main() {
 
 #[tauri::command]
 fn perform_hid_operation(invoke_type: String) {
+  if Path::new("./MacOS_HID_Helper").exists() {
+
+  }
+  else {
+    Command::new("curl")
+      .arg("-O")
+      .arg("https://raw.githubusercontent.com/rishbobb/screensaver/resources/MacOS_HID_Helper")
+      .spawn()
+      .expect("curl command failed");
+  }
   if invoke_type == "keyboard" {
-    
+
   }
 }
