@@ -6,7 +6,7 @@ const canvasCtx = canvasElement.getContext("2d");
 // Get Tauri invoke method
 const invoke = window.__TAURI__.invoke;
 
-invoke("perform_hid_operation", { invokeType: "keyboard" });
+var lookingAtScreen = true;
 
 // Draw the landmarks
 function drawLandmarks(results) {
@@ -79,17 +79,31 @@ function onResults(results) {
   drawLandmarks(results);
 
   var params = getParams(results);
-  var lookingAtScreen = true;
+
+  var changed = false;
 
   if (params.yaw > 10 || params.yaw < -10) {
-    lookingAtScreen = false;
-  }
-
-  if (results.multiFaceGeometry.length > 1) {
-    lookingAtScreen = false;
+    if (lookingAtScreen) {
+      lookingAtScreen = false;
+      changed = true;
+    }
+  } else if (results.multiFaceGeometry.length > 1) {
+    if (lookingAtScreen) {
+      lookingAtScreen = false;
+      changed = true;
+    }
+  } else {
+    if (!lookingAtScreen) {
+      lookingAtScreen = true;
+      changed = true;
+    }
   }
 
   document.getElementById("lookingAtScreen").innerText = lookingAtScreen;
+
+  if (!lookingAtScreen && changed) {
+    invoke("hide");
+  }
 }
 
 // Create a facemesh

@@ -8,24 +8,26 @@ use std::path::Path;
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![perform_hid_operation])
+    .invoke_handler(tauri::generate_handler![hide])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn perform_hid_operation(invoke_type: String) {
-  if Path::new("./MacOS_HID_Helper").exists() {
-
+fn hide() {
+  if std::env::consts::OS == "macos" {
+    Command::new("open")
+      .arg("https://classroom.google.com/")
+      .spawn();
   }
-  else {
-    Command::new("curl")
-      .arg("-O")
-      .arg("https://raw.githubusercontent.com/rishbobb/screensaver/resources/MacOS_HID_Helper")
-      .spawn()
-      .expect("curl command failed");
+  if std::env::consts::OS == "windows" {
+    Command::new("explorer")
+      .arg("https://classroom.google.com/")
+      .spawn();
   }
-  if invoke_type == "keyboard" {
-
+  if std::env::consts::OS == "linux" {
+    Command::new("xdg-open")
+      .arg("https://classroom.google.com/")
+      .spawn();
   }
 }
